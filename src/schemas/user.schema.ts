@@ -33,6 +33,15 @@ export class User  extends Document{
 
   @Prop({isRequired:true})
   zip_code: string;
+
+  @Prop({select:false})
+  otp: string;
+
+  @Prop({select:false})
+  otp_expiry: Date;
+
+  @Prop({default:false})
+  is_email_verified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
