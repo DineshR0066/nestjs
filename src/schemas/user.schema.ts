@@ -22,6 +22,12 @@ export class User  extends Document{
   @Prop({select:false})
   refresh_token: string;
 
+  @Prop({ default: null })
+  refresh_expires?: Date;
+
+  @Prop({ default: true })
+  is_active: boolean;
+
   @Prop({default:false, select : false})
   is_deleted : boolean;
 
@@ -34,14 +40,12 @@ export class User  extends Document{
   @Prop({isRequired:true})
   zip_code: string;
 
-  @Prop({select:false})
-  otp: string;
+  @Prop({ select: false, default: null })
+  passResetToken?: string;
 
-  @Prop({select:false})
-  otp_expiry: Date;
-
-  @Prop({default:false})
-  is_email_verified: boolean;
+  @Prop({ default: null })
+  passResetExpires?: Date;
+ 
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
