@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private jwtService: JwtService) {}
-
   
   use(req: Request, res: Response, next: NextFunction) {
     
@@ -20,7 +19,7 @@ export class AuthMiddleware implements NestMiddleware {
     const token = parts[1];
     try {
       const payload = this.jwtService.verify(token, {
-        secret: process.env.JWT_SECRET || 'hard!to-guess_secret',
+        secret: process.env.JWT_SECRET || 'its_secret',
       });
       
       (req as any).user = payload;

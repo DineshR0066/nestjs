@@ -4,8 +4,11 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { UpdateOrderDto } from './dto/update.order.dto';
 import mongoose from 'mongoose';
-
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { Role } from 'src/auth/roles.enum';
 
 @Controller('orders')
 export class OrdersController {
@@ -15,30 +18,46 @@ export class OrdersController {
     //     return this.orderService.getOrder()
     // }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin, Role.Customer)
     @Get()
     getOrderByPage(
         @Query('page', ParseIntPipe) page: number,
-        @Query('limit', ParseIntPipe) limit: number
-     ) {
-        return this.orderService.getOrderByPage(page, limit);
+        @Query('limit', ParseIntPipe) limit: number,
+        @GetUser() user: any,
+    ) {
+        return this.orderService.getOrderByPage(page, limit, user);
      }
-
+     @UseGuards(JwtAuthGuard, RolesGuard)
+     @Roles(Role.Admin)
      @Get('order-status/:order_status')
      getOrderRevenueByStatus(@Param('order_status') order_status: string) {
         return this.orderService.getOrderRevenueByStatus(order_status);
      }
 
+    
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin, Role.Customer)
     @Get(':id') 
-    getOrdersById(@Param('id') id: string) {
+    async getOrdersById(@Param('id') id: string, @GetUser() user: any) {
         const isValidId = mongoose.Types.ObjectId.isValid(id);
         if(!isValidId) throw new NotFoundException('Order Not found');
-        return this.orderService.getOrderById(id);
+        const order = await this.orderService.getOrderById(id);
+        if (user.role !== 'admin' && order.customer_id !== user._id.toString()) {
+            throw new NotFoundException('Order not found');
+        }
+        return order;
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Post()
     createOrder(@Body() createOrderDto:CreateOrderDto){
         return this.orderService.createOrder(createOrderDto);
     }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Patch('update/:id')
     updateOrder(@Param('id') id: string,@Body() updateOrderDto: UpdateOrderDto) {
         const isValidId = mongoose.Types.ObjectId.isValid(id);
@@ -46,6 +65,8 @@ export class OrdersController {
         return this.orderService.updateOrder(id, updateOrderDto);
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Patch('delete/:id')
     deleteOrder (@Param('id') id: string) {
         const isValidId = mongoose.Types.ObjectId.isValid(id);

@@ -8,6 +8,8 @@ import { AuthController } from './auth.controller';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshTokenStrategy } from './refresh.strategy';
+import { RolesGuard } from './roles.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Module({
   imports: [
@@ -17,13 +19,13 @@ import { RefreshTokenStrategy } from './refresh.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET') || 'hard!to-guess_secret',
+        secret: config.get<string>('JWT_SECRET') || 'ots_secret',
         signOptions: { expiresIn: '1h' },
       }),
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshTokenStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshTokenStrategy, RolesGuard, JwtAuthGuard],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, RolesGuard, JwtAuthGuard],
 })
 export class AuthModule {}

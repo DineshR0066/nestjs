@@ -15,21 +15,24 @@ export class OrdersService {
     //     return orders;
     // }
 
-    async getOrderByPage(page: number, limit: number) {
+    async getOrderByPage(page: number, limit: number, user?: any) {
         const skip = (page - 1) * limit;
-        const orders = await this.orderModel.find(
-            {is_deleted: false}
-        )
-        .skip(skip)
-        .limit(limit)
-        const totalOrders = await this.orderModel.countDocuments({is_deleted: false});
+        const filter: any = { is_deleted: false };
+        if (user && user.role !== 'admin') {
+            // customers only see their own orders
+            filter.customer_id = user._id.toString();
+        }
+        const orders = await this.orderModel.find(filter)
+            .skip(skip)
+            .limit(limit);
+        const totalOrders = await this.orderModel.countDocuments(filter);
         return {
             page,
             limit,
             totalOrders,
-            totalPages: Math.ceil(totalOrders/limit),
-            orders
-        }
+            totalPages: Math.ceil(totalOrders / limit),
+            orders,
+        };
     }
 
     async getOrderRevenueByStatus(order_status: string) {

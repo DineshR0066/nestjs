@@ -25,6 +25,18 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Role Based Access Control (RBAC)
+
+This project now includes a simple RBAC system:
+
+- **Roles**: `admin` and `customer` are supported.
+- JWT tokens issued by the application carry a `role` claim.
+- The `@Roles()` decorator and `RolesGuard` enforce access on protected routes.
+- Customers can only see their own profile, orders and payments; admins have full access.
+- New endpoints such as `GET /users/me` return the authenticated user's information.
+
+Use the provided decorators and guards when adding new protected routes.
+
 ## Project setup
 
 ```bash

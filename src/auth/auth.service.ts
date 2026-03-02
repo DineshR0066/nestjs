@@ -38,7 +38,6 @@ export class AuthService {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET') || 'refresh-secret-key',
     });
 
-    // Store refresh token in database
     await this.usersService.updateRefreshToken(user._id, refreshToken);
 
     return {
@@ -62,7 +61,7 @@ export class AuthService {
     
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: '15m',
-      secret: this.configService.get<string>('JWT_SECRET') || 'hard!to-guess_secret',
+      secret: this.configService.get<string>('JWT_SECRET') || 'its_secret',
     });
 
     return {
